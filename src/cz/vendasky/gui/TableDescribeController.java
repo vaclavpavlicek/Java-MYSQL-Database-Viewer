@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class RowsController implements Initializable {
+public class TableDescribeController implements Initializable {
 
     @FXML
-    private TableView rowsTableView;
+    private TableView describeTableView;
 
     @FXML
     public void goBack(ActionEvent actionEvent) throws IOException {
@@ -67,18 +67,13 @@ public class RowsController implements Initializable {
 
     private void loadRowsToTable(Statement statement) throws SQLException {
         Model model = Model.getInstace();
-        statement.executeQuery("USE " + model.getSelectedDatabase());
-        ResultSet columnsQuery = statement.executeQuery("SHOW COLUMNS FROM " + model.getSelectedTable());
-        List<String> columns = new ArrayList<String>();
-        while (columnsQuery.next()) {
-            try {
-                if (columnsQuery.getString(1) != null) {
-                    columns.add(columnsQuery.getString(1));
-                }
-            } catch (SQLException exception) {
-                break;
-            }
-        }
+        List<String> columns = new ArrayList<>();
+        columns.add("field");
+        columns.add("type");
+        columns.add("null");
+        columns.add("key");
+        columns.add("default");
+        columns.add("extra");
         for (int i = 0; i < columns.size(); i++) {
             TableColumn tableColumn = new TableColumn<List<String>, String>(columns.get(i));
             int finalI = i;
@@ -88,11 +83,11 @@ public class RowsController implements Initializable {
                     return new ReadOnlyStringWrapper(data.getValue().get(finalI));
                 }
             });
-            rowsTableView.getColumns().add(tableColumn);
+            describeTableView.getColumns().add(tableColumn);
         }
 
         final ObservableList<List<String>> data = FXCollections.observableArrayList();
-        ResultSet rs = statement.executeQuery("SELECT * FROM " + model.getSelectedTable());
+        ResultSet rs = statement.executeQuery("DESCRIBE " + model.getSelectedDatabase() + "." + model.getSelectedTable());
 
         while (rs.next()) {
             List<String> cells = new ArrayList<String>();
@@ -105,7 +100,8 @@ public class RowsController implements Initializable {
             });
             data.add(cells);
         }
-        rowsTableView.getItems().addAll(data);
+        describeTableView.getItems().addAll(data);
     }
 
 }
+

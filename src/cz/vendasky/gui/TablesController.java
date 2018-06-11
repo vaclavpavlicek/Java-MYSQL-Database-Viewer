@@ -56,18 +56,19 @@ public class TablesController implements Initializable {
                 public void handle(ActionEvent event) {
                     try {
                         model.setSelectedTable(lastItem);
-                        MySQLConnection instance = MySQLConnection.getInstance();
-                        Connection connection = instance.getConnection();
-                        Statement statement = connection.createStatement();
-                        System.out.println("DESCRIBE " + model.getSelectedDatabase() + "." + model.getSelectedTable());
-                        ResultSet rs = statement.executeQuery("DESCRIBE " + model.getSelectedDatabase() + "." + model.getSelectedTable());
-                        while (rs.next()) {
-                            System.out.println(rs.getString("field") + " " + rs.getString("type") + " " + rs.getString("null") + " " + rs.getString("key") + " " + rs.getString("default") + " " + rs.getString("extra"));
-                        }
+                        ((Node) (event.getSource())).getScene().getWindow().hide();
 
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
+                        Parent root = FXMLLoader.load(getClass().getResource("tableDescribe.fxml"));
+
+                        Stage stage = new Stage();
+                        Scene scene = new Scene(root);
+
+                        stage.setScene(scene);
+
+                        stage.setTitle("Table describe");
+
+                        stage.show();
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                     System.out.println(lastItem + " : " + event);
